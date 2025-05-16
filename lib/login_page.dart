@@ -1,9 +1,8 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_proyect1/dashboard.dart';
-import 'package:flutter_proyect1/main.dart';
 import 'package:flutter_proyect1/register_page.dart';
-import 'package:provider/provider.dart';
+import 'auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,10 +17,11 @@ class _LoginPageState extends State<LoginPage> {
 
   bool visibilityPass = false;
 
+  // Buat instance AuthService langsung (tanpa Provider)
+  final AuthService authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
-    final authService = context.read<AuthService>();
-
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -96,10 +96,10 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          try {
-                            await authService.signInWithEmailAndPassword(
-                                email.text, password.text);
-                            if (context.mounted) {
+                          final result = await authService.login(email.text, password.text);
+                          if (context.mounted) {
+                            if (result == null) {
+                              // sukses login
                               AwesomeDialog(
                                 context: context,
                                 dialogType: DialogType.success,
@@ -109,20 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                                 btnOkOnPress: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Dashboard()),
+                                    MaterialPageRoute(builder: (context) => Dashboard()),
                                   );
                                 },
                               ).show();
-                            }
-                          } catch (e) {
-                            print("Error detail: $e");
-                            if (context.mounted) {
-                              showAlert(
-                                  context,
-                                  'Login Gagal',
-                                  'Username atau Password salah',
-                                  DialogType.error);
+                            } else {
+                              // gagal login
+                              showAlert(context, 'Login Gagal', result, DialogType.error);
                             }
                           }
                         },
@@ -131,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: Color.fromARGB(255, 7, 6, 60),
+                          backgroundColor: const Color.fromARGB(255, 7, 6, 60),
                         ),
                         child: const Text(
                           'Login',
@@ -144,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Belum punya akun?"),
+                          const Text("Belum punya akun?"),
                           TextButton.icon(
                             onPressed: () {
                               Navigator.push(

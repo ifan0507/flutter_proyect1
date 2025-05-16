@@ -1,9 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_proyect1/login_page.dart';
-import 'package:flutter_proyect1/main.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_proyect1/auth_service.dart'; // pastikan sudah ada
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,12 +11,16 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController name = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
+
+  bool visibilityPass = false;  // pindahkan ke sini supaya state bisa berubah
+
+  final AuthService authService = AuthService(); // instance langsung, tanpa provider
+
   @override
   Widget build(BuildContext context) {
-    final authService = context.read<AuthService>();
-    bool visibilityPass = false;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -53,11 +55,23 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 30),
                     TextField(
+                      controller: name,
+                      decoration: InputDecoration(
+                        labelText: 'Nama',
+                        hintText: 'Nama lengkap',
+                        prefixIcon: const Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
                       controller: email,
                       decoration: InputDecoration(
                         labelText: 'Email',
                         hintText: 'Example@gmail.com',
-                        prefixIcon: const Icon(Icons.person),
+                        prefixIcon: const Icon(Icons.email),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -92,42 +106,32 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await authService.createUserWithEmailAndPassword(
-                                email.text, password.text);
-
+                      onPressed: () async {
+                            final result = await authService.register(email.text, password.text);
                             if (context.mounted) {
-                              AwesomeDialog(
-                                context: context,
-                                dialogType: DialogType.success,
-                                animType: AnimType.bottomSlide,
-                                title: 'Register Berhasil',
-                                desc: 'Silahkan login!',
-                                btnOkOnPress: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()),
-                                  );
-                                },
-                              ).show();
+                              if (result == null) {
+                                AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.success,
+                                  animType: AnimType.bottomSlide,
+                                  title: 'Registrasi Berhasil',
+                                  desc: 'Silakan login menggunakan akun Anda',
+                                  btnOkOnPress: () {
+                                    Navigator.pop(context);
+                                  },
+                                ).show();
+                              } else {
+                                showAlert(context, 'Registrasi Gagal', result, DialogType.error);
+                              }
                             }
-                          } catch (e) {
-                            print("Error detail: $e");
+                          },
 
-                            if (context.mounted) {
-                              showAlert(context, 'Register Gagal',
-                                  'Error: ${e.toString()}', DialogType.error);
-                            }
-                          }
-                        },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: Color.fromARGB(255, 7, 6, 60),
+                          backgroundColor: const Color.fromARGB(255, 7, 6, 60),
                         ),
                         child: const Text(
                           'Register',
