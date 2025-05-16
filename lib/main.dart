@@ -1,168 +1,98 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import './halaman_utama.dart';
+import 'package:flutter_proyect1/login_page.dart';
+import 'package:provider/provider.dart';
+import 'dashboard.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    title: 'Program UTS',
-    home: HalamanUtama(),
-    debugShowCheckedModeBanner: false,
-  ));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyBzqthadSkovivdccCiok8KwgCHXn95WpM",
+          appId: "1:91967834875:android:573ea32cc72fe0a8ed7e5e",
+          messagingSenderId: "91967834875",
+          projectId: "authfirebase-febb4"));
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthService(),
+      child: MaterialApp(
+        title: 'Program UTS',
+        home: const AuthWrapper(),
+        debugShowCheckedModeBanner: false,
+      ),
+    ),
+  );
 }
 
-class HalamanUtama extends StatefulWidget {
-  const HalamanUtama({super.key});
-
-  @override
-  State<HalamanUtama> createState() => _HalamanUtamaState();
-}
-
-class _HalamanUtamaState extends State<HalamanUtama> {
-  bool visibilityPass = false;
-
-  final String myUser = 'admin';
-  final String myPass = '123';
-
-  TextEditingController cUser = TextEditingController();
-  TextEditingController cPass = TextEditingController();
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 7, 6, 60),
-              Color.fromARGB(255, 237, 239, 239)
-            ],
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 15,
-              shadowColor: Colors.black45,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              child: Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage('images/logo.png'),
-                    ),
-                    const SizedBox(height: 30),
-                    TextField(
-                      controller: cUser,
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        hintText: 'Input Username Anda',
-                        prefixIcon: const Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextField(
-                      controller: cPass,
-                      obscureText: !visibilityPass,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Input Password Anda',
-                        prefixIcon: const Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              visibilityPass = !visibilityPass;
-                            });
-                          },
-                          icon: Icon(
-                            visibilityPass
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Login(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          backgroundColor: Color.fromARGB(255, 7, 6, 60),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    try {
+      if (auth.currentUser != null) {
+        return const Dashboard();
+      } else {
+        return const LoginPage();
+      }
+    } catch (e) {
+      return const LoginPage();
+    }
   }
+}
 
-  void Login(BuildContext context) {
-    if (cUser.text == myUser && cPass.text == myPass) {
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.success,
-        animType: AnimType.bottomSlide,
-        title: 'Login Berhasil',
-        desc: 'Selamat datang, $myUser!',
-        btnOkOnPress: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
-          );
-        },
-      ).show();
-    } else if (cUser.text.isEmpty) {
-      showAlert(
-          context, 'Oops!', 'Username tidak boleh kosong', DialogType.warning);
-    } else if (cPass.text.isEmpty) {
-      showAlert(
-          context, 'Oops!', 'Password tidak boleh kosong', DialogType.warning);
-    } else {
-      showAlert(context, 'Login Gagal', 'Username atau Password salah',
-          DialogType.error);
+class AuthService with ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? get currentUser => _auth.currentUser;
+
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  Future<String?> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        return 'Email tidak ditemukan.';
+      } else if (e.code == 'wrong-password') {
+        return 'Password salah.';
+      } else if (e.code == 'invalid-email') {
+        return 'Format email tidak valid.';
+      } else if (e.code == 'user-disabled') {
+        return 'Akun ini telah dinonaktifkan.';
+      } else {
+        return 'Terjadi kesalahan: ${e.message}';
+      }
+    } catch (e) {
+      return 'Terjadi kesalahan. Coba lagi.';
     }
   }
 
-  void showAlert(
-      BuildContext context, String title, String desc, DialogType type) {
-    AwesomeDialog(
-      context: context,
-      dialogType: type,
-      animType: AnimType.scale,
-      title: title,
-      desc: desc,
-      btnOkOnPress: () {},
-    ).show();
+  Future<String?> createUserWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        return 'Email sudah digunakan.';
+      } else if (e.code == 'weak-password') {
+        return 'Password terlalu lemah (minimal 6 karakter).';
+      } else if (e.code == 'invalid-email') {
+        return 'Format email tidak valid.';
+      } else {
+        return 'Terjadi kesalahan: ${e.message}';
+      }
+    } catch (e) {
+      return "Terjadi kesalahan. Coba lagi.";
+    }
   }
 }

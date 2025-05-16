@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   awesome_dialog: ^3.1.0
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.16.0
+  provider: ^6.0.4
+  permission_handler: ^10.4.3
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_proyect1/login_page.dart';
 import 'package:flutter_proyect1/main.dart';
 
 class Dashboard extends StatefulWidget {
@@ -113,11 +114,11 @@ class _DashboardState extends State<Dashboard> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Logout"),
+            child: const Text("Logout", style: TextStyle(color: Colors.white)),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HalamanUtama()),
+                MaterialPageRoute(builder: (context) => LoginPage()),
               );
             },
           ),
