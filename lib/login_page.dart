@@ -165,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
 void showAlert(
     BuildContext context, String title, String desc, DialogType type) {
   AwesomeDialog(
@@ -177,3 +176,4 @@ void showAlert(
     btnOkOnPress: () {},
   ).show();
 }
+

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_proyect1/login_page.dart';
-import 'package:flutter_proyect1/main.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -23,6 +22,58 @@ class _DashboardState extends State<Dashboard> {
         centerTitle: true,
         elevation: 4,
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.blue),
+              title: const Text('Profil'),
+              onTap: () {
+                Navigator.pop(context); // tutup drawer
+                // TODO: Navigasi ke halaman Profil
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings, color: Colors.orange),
+              title: const Text('Pengaturan'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Navigasi ke halaman Pengaturan
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.analytics, color: Colors.green),
+              title: const Text('Laporan'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Navigasi ke halaman Laporan
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+                _showLogoutDialog(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
@@ -35,27 +86,31 @@ class _DashboardState extends State<Dashboard> {
               label: 'Profil',
               color: Colors.blue,
               onTap: () {
-                // Aksi saat diklik
+                // TODO: Navigasi ke halaman Profil
               },
             ),
             _buildDashboardCard(
               icon: Icons.settings,
               label: 'Pengaturan',
               color: Colors.orange,
-              onTap: () {},
+              onTap: () {
+                // TODO: Navigasi ke halaman Pengaturan
+              },
             ),
             _buildDashboardCard(
               icon: Icons.analytics,
               label: 'Laporan',
               color: Colors.green,
-              onTap: () {},
+              onTap: () {
+                // TODO: Navigasi ke halaman Laporan
+              },
             ),
             _buildDashboardCard(
-              icon: Icons.logout,
-              label: 'Logout',
-              color: Colors.redAccent,
+              icon: Icons.info,
+              label: 'Info',
+              color: Colors.purple,
               onTap: () {
-                _showLogoutDialog(context);
+                // Kamu bisa tambah fungsi lain di sini
               },
             ),
           ],
