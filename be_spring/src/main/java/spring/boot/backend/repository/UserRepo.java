@@ -15,5 +15,7 @@ import spring.boot.backend.model.User;
  * @author LENOVO
  */
 public interface UserRepo extends JpaRepository<User, Integer> {
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
+
+    User findByName(String name);
 }

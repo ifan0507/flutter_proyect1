@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_proyect1/login_page.dart';
+import 'package:flutter_proyect1/profile.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -14,11 +15,12 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
       appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 2, 38, 101),
         title: const Text(
           'Dashboard',
           style: TextStyle(color: Colors.white),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         elevation: 4,
       ),
@@ -28,7 +30,7 @@ class _DashboardState extends State<Dashboard> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blueAccent,
+                color: const Color.fromARGB(255, 2, 38, 101),
               ),
               child: Text(
                 'Menu',
@@ -43,7 +45,8 @@ class _DashboardState extends State<Dashboard> {
               title: const Text('Profil'),
               onTap: () {
                 Navigator.pop(context); // tutup drawer
-                // TODO: Navigasi ke halaman Profil
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Profile()));
               },
             ),
             ListTile(
@@ -86,7 +89,9 @@ class _DashboardState extends State<Dashboard> {
               label: 'Profil',
               color: Colors.blue,
               onTap: () {
-                // TODO: Navigasi ke halaman Profil
+                Navigator.pop(context); // tutup drawer
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Profile()));
               },
             ),
             _buildDashboardCard(
